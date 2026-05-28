@@ -1,36 +1,9 @@
 import 'dart:html' as html;
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-class AppGallery extends StatefulWidget {
+class AppGallery extends StatelessWidget {
   const AppGallery({super.key});
-
-  @override
-  State<AppGallery> createState() => _AppGalleryState();
-}
-
-class _AppGalleryState extends State<AppGallery> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _floatAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(seconds: 3),
-      vsync: this,
-    )..repeat(reverse: true);
-    _floatAnimation = Tween<double>(begin: -8, end: 8).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   void _downloadApk() {
     final anchor = html.AnchorElement(href: '/apk/app-release.apk')
@@ -116,16 +89,11 @@ class _AppGalleryState extends State<AppGallery> with SingleTickerProviderStateM
               Icons.play_arrow_rounded,
               () => _downloadApk(),
             ),
-            _buildStoreButton(
-              'App Store',
-              Icons.apple_rounded,
-              () => _downloadApk(),
-            ),
           ],
         ),
         const SizedBox(height: 16),
         Text(
-          'Available on Android. iOS coming soon.',
+          'Available on Android.',
           style: TextStyle(
             fontSize: 13,
             color: Colors.white.withValues(alpha: 0.5),
@@ -142,16 +110,7 @@ class _AppGalleryState extends State<AppGallery> with SingleTickerProviderStateM
       child: Stack(
         alignment: Alignment.center,
         children: [
-          AnimatedBuilder(
-            animation: _floatAnimation,
-            builder: (context, child) {
-              return Transform.translate(
-                offset: Offset(0, _floatAnimation.value),
-                child: child,
-              );
-            },
-            child: _buildPhoneFrame('assets/Images/app_screen.png'),
-          ),
+          _buildPhoneFrame('assets/Images/app_screen.png'),
           Positioned(
             right: -20,
             bottom: 60,

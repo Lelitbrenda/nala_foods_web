@@ -1,36 +1,9 @@
 import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../data.dart';
 
-class HeroSection extends StatefulWidget {
+class HeroSection extends StatelessWidget {
   const HeroSection({super.key});
-
-  @override
-  State<HeroSection> createState() => _HeroSectionState();
-}
-
-class _HeroSectionState extends State<HeroSection> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _floatAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(seconds: 3),
-      vsync: this,
-    )..repeat(reverse: true);
-    _floatAnimation = Tween<double>(begin: -12, end: 12).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   void _downloadApk() {
     final anchor = html.AnchorElement(href: '/apk/app-release.apk')
@@ -149,6 +122,8 @@ class _HeroSectionState extends State<HeroSection> with SingleTickerProviderStat
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
+        Image.asset('assets/logo/logo19.png', height: 120, fit: BoxFit.contain),
+        const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
@@ -211,75 +186,66 @@ class _HeroSectionState extends State<HeroSection> with SingleTickerProviderStat
   }
 
   Widget _buildPhoneMockup() {
-    return AnimatedBuilder(
-      animation: _floatAnimation,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, _floatAnimation.value),
-          child: child,
-        );
-      },
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 260),
-        height: 520,
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(36),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 60,
-              offset: const Offset(0, 30),
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 260),
+      height: 520,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(36),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 60,
+            offset: const Offset(0, 30),
+          ),
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.15),
+            blurRadius: 80,
+            offset: const Offset(0, 40),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(36),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.asset(
+                'assets/Images/app_screen.png',
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  color: AppColors.accent,
+                  child: const Center(
+                    child: Icon(Icons.restaurant_menu, size: 64, color: Colors.white38),
+                  ),
+                ),
+              ),
             ),
-            BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.15),
-              blurRadius: 80,
-              offset: const Offset(0, 40),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: 30,
+                color: AppColors.accent,
+              ),
+            ),
+            Positioned(
+              top: 8,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  width: 120,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ),
             ),
           ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(36),
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: Image.asset(
-                  'assets/Images/app_screen.png',
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: AppColors.accent,
-                    child: const Center(
-                      child: Icon(Icons.restaurant_menu, size: 64, color: Colors.white38),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  height: 30,
-                  color: AppColors.accent,
-                ),
-              ),
-              Positioned(
-                top: 8,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Container(
-                    width: 120,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

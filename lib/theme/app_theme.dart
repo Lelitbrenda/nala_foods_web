@@ -37,6 +37,8 @@ class AppColors {
 
 class AppTheme {
   static ThemeData get lightTheme => ThemeData(
+    fontFamily: 'sans-serif',
+    fontFamilyFallback: const ['Arial', 'Helvetica', 'Roboto'],
     useMaterial3: true,
     scaffoldBackgroundColor: AppColors.background,
     primaryColor: AppColors.primary,

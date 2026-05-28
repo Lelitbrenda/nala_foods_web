@@ -23,13 +23,13 @@ class CtaSection extends StatelessWidget {
         children: [
           const Text(
             'Ready to Order?',
-            style: TextStyle(
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-            textAlign: TextAlign.center,
-          ),
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
           const SizedBox(height: 16),
           Text(
             'Join thousands of happy customers. Download Nala Foods and start ordering today!',
