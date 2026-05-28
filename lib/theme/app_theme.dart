@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color background = Color(0xFFECE7E7);
+  static const Color background = Color(0xFFFAF6F1);
   static const Color surface = Color(0xFFFFFFFF);
   static const Color surfaceLight = Color(0xFFFFF5F0);
 
-  static const Color primary = Color(0xFFFF7043);
-  static const Color accent = Color(0xFFD84315);
+  static const Color primary = Color(0xFFE8590C);
+  static const Color accent = Color(0xFF1E293B);
 
   static const Color border = Color(0xFFEDE7DD);
   static const Color textPrimary = Color(0xFF3E2723);
@@ -18,9 +18,9 @@ class AppColors {
   static const Color error = Color(0xFFE53935);
   static const Color warning = Color(0xFFFFA000);
 
-  static const Color primarySoft = Color(0xFFFFE0B2);
-  static const Color primaryDark = Color(0xFFD84315);
-  static const Color accentLight = Color(0xFFFFCCBC);
+  static const Color primarySoft = Color(0xFFFFEDD5);
+  static const Color primaryDark = Color(0xFFBF4609);
+  static const Color accentLight = Color(0xFFE2E8F0);
 
   static const Color grey = Color(0xFF9E9E9E);
   static const Color greyLight = Color(0xFFFAFAFA);
@@ -31,6 +31,8 @@ class AppColors {
   static const Color grey700 = Color(0xFF616161);
 
   static const Color amber = Color(0xFFFFB300);
+
+  static const Color cardElevated = Color(0xFFFFFFFF);
 }
 
 class AppTheme {
@@ -51,11 +53,11 @@ class AppTheme {
       centerTitle: false,
     ),
     textTheme: const TextTheme(
-      headlineLarge: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: AppColors.textPrimary, height: 1.2),
-      headlineMedium: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: AppColors.textPrimary, height: 1.2),
-      headlineSmall: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary, height: 1.3),
+      headlineLarge: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: AppColors.textPrimary, height: 1.1),
+      headlineMedium: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: AppColors.textPrimary, height: 1.15),
+      headlineSmall: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary, height: 1.2),
       titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-      titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+      titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
       titleSmall: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
       bodyLarge: TextStyle(fontSize: 18, fontWeight: FontWeight.normal, color: AppColors.textSecondary, height: 1.6),
       bodyMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: AppColors.textSecondary, height: 1.5),

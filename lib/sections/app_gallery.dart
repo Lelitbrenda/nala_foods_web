@@ -1,7 +1,7 @@
+import 'dart:html' as html;
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
-import '../widgets/section_container.dart';
 
 class AppGallery extends StatefulWidget {
   const AppGallery({super.key});
@@ -10,122 +10,269 @@ class AppGallery extends StatefulWidget {
   State<AppGallery> createState() => _AppGalleryState();
 }
 
-class _AppGalleryState extends State<AppGallery> {
-  final PageController _pageController = PageController(viewportFraction: 0.75);
-  int _currentPage = 0;
+class _AppGalleryState extends State<AppGallery> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _floatAnimation;
 
-  final List<String> _imageAssets = [
-    'assets/Images/image1.png',
-    'assets/Images/image2.png',
-    'assets/Images/image3.png',
-    'assets/Images/image4.png',
-    'assets/Images/promo1.png',
-    'assets/Images/food.jpg',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 3),
+      vsync: this,
+    )..repeat(reverse: true);
+    _floatAnimation = Tween<double>(begin: -8, end: 8).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _controller.dispose();
     super.dispose();
+  }
+
+  void _downloadApk() {
+    final anchor = html.AnchorElement(href: '/apk/app-release.apk')
+      ..download = 'NalaFoods.apk';
+    anchor.click();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SectionContainer(
-      padding: const EdgeInsets.symmetric(vertical: 64),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.accent,
+            const Color(0xFF0F172A),
+            AppColors.accent,
+          ],
+        ),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWide = constraints.maxWidth > 700;
+          return isWide ? _buildDesktopLayout() : _buildMobileLayout();
+        },
+      ),
+    );
+  }
+
+  Widget _buildDesktopLayout() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Expanded(child: _buildTextContent()),
+        const SizedBox(width: 40),
+        _buildPhoneStack(),
+      ],
+    );
+  }
+
+  Widget _buildMobileLayout() {
+    return Column(
+      children: [
+        _buildTextContent(),
+        const SizedBox(height: 40),
+        _buildPhoneStack(),
+      ],
+    );
+  }
+
+  Widget _buildTextContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text(
+          'Order Food\nAnywhere, Anytime',
+          style: TextStyle(
+            fontSize: 36,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            height: 1.1,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Download the Nala Foods app and enjoy seamless food ordering from your favorite local restaurants.',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.white.withValues(alpha: 0.7),
+            height: 1.6,
+          ),
+        ),
+        const SizedBox(height: 32),
+        Wrap(
+          spacing: 16,
+          runSpacing: 12,
+          children: [
+            _buildStoreButton(
+              'Google Play',
+              Icons.play_arrow_rounded,
+              () => _downloadApk(),
+            ),
+            _buildStoreButton(
+              'App Store',
+              Icons.apple_rounded,
+              () => _downloadApk(),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Available on Android. iOS coming soon.',
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.white.withValues(alpha: 0.5),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPhoneStack() {
+    return SizedBox(
+      height: 500,
+      width: 300,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          Text(
-            'App Gallery',
-            style: Theme.of(context).textTheme.headlineSmall,
+          AnimatedBuilder(
+            animation: _floatAnimation,
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(0, _floatAnimation.value),
+                child: child,
+              );
+            },
+            child: _buildPhoneFrame('assets/Images/app_screen.png'),
           ),
-          const SizedBox(height: 12),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 500),
-            child: Text(
-              'Explore the Nala Foods experience',
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center,
+          Positioned(
+            right: -20,
+            bottom: 60,
+            child: Transform.rotate(
+              angle: 0.15,
+              child: Container(
+                width: 200,
+                height: 380,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(28),
+                  child: Image.asset(
+                    'assets/Images/20260524_194355.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      child: const Icon(Icons.restaurant_menu, size: 40, color: Colors.white38),
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 40),
-          SizedBox(
-            height: 420,
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: _imageAssets.length,
-              onPageChanged: (index) {
-                setState(() => _currentPage = index);
-              },
-              itemBuilder: (context, index) {
-                return _buildGalleryItem(index);
-              },
-            ),
-          ),
-          const SizedBox(height: 24),
-          _buildPageIndicator(),
         ],
       ),
     );
   }
 
-  Widget _buildGalleryItem(int index) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+  Widget _buildPhoneFrame(String imagePath) {
+    return Container(
+      width: 240,
+      height: 480,
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: AppColors.textPrimary.withValues(alpha: 0.12),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
+            color: AppColors.primary.withValues(alpha: 0.15),
+            blurRadius: 60,
+            offset: const Offset(0, 20),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 40,
+            offset: const Offset(0, 15),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Image.asset(
-          _imageAssets[index],
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stack) {
-            return Container(
-              color: AppColors.grey100,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.image_rounded, size: 56, color: AppColors.grey600),
-                    const SizedBox(height: 12),
-                    Text('Image ${index + 1}', style: const TextStyle(color: AppColors.textMuted)),
-                  ],
+        borderRadius: BorderRadius.circular(32),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  color: AppColors.accent,
+                  child: const Center(
+                    child: Icon(Icons.phone_android, size: 64, color: Colors.white38),
+                  ),
                 ),
               ),
-            );
-          },
+            ),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: 28,
+                decoration: BoxDecoration(
+                  color: AppColors.accent,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                ),
+                child: Center(
+                  child: Container(
+                    width: 100,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildPageIndicator() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(_imageAssets.length, (index) {
-        final isActive = index == _currentPage;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: isActive ? 24 : 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color: isActive ? AppColors.primary : AppColors.grey300,
-            borderRadius: BorderRadius.circular(4),
+  Widget _buildStoreButton(String label, IconData icon, VoidCallback onPressed) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        foregroundColor: AppColors.accent,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        elevation: 0,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 22),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Download on', style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
+              Text(label, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            ],
           ),
-        );
-      }),
+        ],
+      ),
     );
   }
 }

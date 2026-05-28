@@ -18,7 +18,7 @@ class ValueCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
@@ -47,12 +47,12 @@ class ValueCard extends StatelessWidget {
               size: 28,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           Text(
             title,
             style: Theme.of(context).textTheme.titleMedium,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             description,
             style: Theme.of(context).textTheme.bodySmall,

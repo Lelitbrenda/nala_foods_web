@@ -1,148 +1,250 @@
+import 'dart:html' as html;
+import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../widgets/section_container.dart';
+import '../data.dart';
 
 class CustomerExperience extends StatelessWidget {
   const CustomerExperience({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SectionContainer(
-      padding: const EdgeInsets.symmetric(vertical: 64),
-      backgroundColor: AppColors.surfaceLight,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            'Customer Experience',
-            style: Theme.of(context).textTheme.headlineSmall,
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Image.asset(
+            'assets/Images/20260515_122857.jpg',
+            fit: BoxFit.cover,
           ),
-          const SizedBox(height: 12),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 500),
-            child: Text(
-              'Everything you need to find and enjoy your favorite food',
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
+        ),
+        Positioned.fill(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+            child: Container(color: Colors.black.withValues(alpha: 0.45)),
           ),
-          const SizedBox(height: 40),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final isWide = constraints.maxWidth > 600;
-              return isWide
-                  ? Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: _buildAppScreenshot(),
-                        ),
-                        const SizedBox(width: 40),
-                        Expanded(
-                          flex: 3,
-                          child: _buildFeaturesList(),
-                        ),
-                      ],
-                    )
-                  : Column(
-                      children: [
-                        _buildAppScreenshot(),
-                        const SizedBox(height: 24),
-                        _buildFeaturesList(),
-                      ],
-                    );
-            },
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 24),
+          child: Column(
+            children: [
+              const Text(
+                'Popular Restaurants',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Explore top-rated restaurants in your area',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white.withValues(alpha: 0.7),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final isWide = constraints.maxWidth > 700;
+                  if (isWide) {
+                    return _buildGrid(context);
+                  }
+                  return _buildCarousel(context);
+                },
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildAppScreenshot() {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 260),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.textPrimary.withValues(alpha: 0.15),
-            blurRadius: 30,
-            offset: const Offset(0, 15),
-          ),
-        ],
+  Widget _buildGrid(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 1.0,
+        crossAxisSpacing: 20,
+        mainAxisSpacing: 20,
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: AspectRatio(
-          aspectRatio: 0.7,
-          child: Image.asset(
-            'assets/Images/image1.png',
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stack) {
-              return Container(
-                color: AppColors.grey100,
-                child: const Center(
-                  child: Icon(
-                    Icons.phone_android,
-                    size: 64,
-                    color: AppColors.grey600,
-                  ),
-                ),
-              );
-            },
+      itemCount: 3,
+      itemBuilder: (context, index) => _RestaurantCard(restaurant: restaurants[index]),
+    );
+  }
+
+  Widget _buildCarousel(BuildContext context) {
+    return SizedBox(
+      height: 360,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: 3,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        itemBuilder: (context, index) => Padding(
+          padding: const EdgeInsets.only(right: 16),
+          child: SizedBox(
+            width: 280,
+            child: _RestaurantCard(restaurant: restaurants[index]),
           ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildFeaturesList() {
-    final features = [
-      {'icon': Icons.category_rounded, 'title': 'Browse Categories', 'desc': 'Explore restaurants by cuisine, price, and ratings'},
-      {'icon': Icons.compare_rounded, 'title': 'Compare Restaurants', 'desc': 'View menus, prices, and reviews all in one place'},
-      {'icon': Icons.add_shopping_cart_rounded, 'title': 'Add to Cart', 'desc': 'Build your perfect meal with easy customization'},
-      {'icon': Icons.credit_card_rounded, 'title': 'Checkout Smoothly', 'desc': 'Pay securely with multiple payment options'},
-    ];
+class _RestaurantCard extends StatefulWidget {
+  final RestaurantData restaurant;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: features.map((f) => _buildFeatureItem(
-        f['icon'] as IconData,
-        f['title'] as String,
-        f['desc'] as String,
-      )).toList(),
-    );
+  const _RestaurantCard({required this.restaurant});
+
+  @override
+  State<_RestaurantCard> createState() => _RestaurantCardState();
+}
+
+class _RestaurantCardState extends State<_RestaurantCard> {
+  bool _isHovered = false;
+
+  void _orderNow() {
+    final anchor = html.AnchorElement(href: '/apk/app-release.apk')
+      ..download = 'NalaFoods.apk';
+    anchor.click();
   }
 
-  Widget _buildFeatureItem(IconData icon, String title, String desc) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        transform: _isHovered ? (Matrix4.identity()..translate(0, -8)) : Matrix4.identity(),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: _isHovered ? 0.12 : 0.06),
+              blurRadius: _isHovered ? 30 : 16,
+              offset: Offset(0, _isHovered ? 12 : 6),
             ),
-            child: Icon(icon, color: AppColors.primary, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-                const SizedBox(height: 4),
-                Text(desc, style: const TextStyle(fontSize: 14, color: AppColors.textMuted)),
-              ],
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 3,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      widget.restaurant.image,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        color: AppColors.grey200,
+                        child: const Icon(Icons.restaurant, size: 48, color: AppColors.grey),
+                      ),
+                    ),
+                    Positioned(
+                      top: 12,
+                      right: 12,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.star, size: 14, color: AppColors.amber),
+                            const SizedBox(width: 4),
+                            Text(
+                              widget.restaurant.rating.toString(),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.restaurant.name,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.primarySoft,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            widget.restaurant.category,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.primaryDark,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(Icons.access_time_rounded, size: 13, color: AppColors.textMuted),
+                        const SizedBox(width: 4),
+                        Text(
+                          widget.restaurant.deliveryTime,
+                          style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _orderNow,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          elevation: 0,
+                        ),
+                        child: const Text('Order Now', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
