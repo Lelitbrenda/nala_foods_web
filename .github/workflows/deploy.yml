@@ -22,7 +22,7 @@ jobs:
       - name: Build Web
         run: |
           flutter pub get
-          flutter build web --release --base-href "/nala_foods_web/"
+          flutter build web --release --base-href "/"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
