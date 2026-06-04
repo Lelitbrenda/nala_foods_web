@@ -12,35 +12,24 @@ class HeroSection extends StatefulWidget {
   State<HeroSection> createState() => _HeroSectionState();
 }
 
-class _HeroSectionState extends State<HeroSection>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _floatController;
-  late Animation<double> _floatAnimation;
-  bool _isPhoneHovered = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _floatController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
-    _floatAnimation = Tween<double>(begin: -8, end: 8).animate(
-      CurvedAnimation(parent: _floatController, curve: Curves.easeInOutSine),
-    );
-  }
-
-  @override
-  void dispose() {
-    _floatController.dispose();
-    super.dispose();
-  }
+class _HeroSectionState extends State<HeroSection> {
+  static const List<String> _mockups = [
+    'assets/mockups/photo1.png',
+    'assets/mockups/photo2.png',
+  ];
+  int _currentMockup = 0;
 
   Future<void> _downloadApk() async {
     final uri = Uri.parse('/apk/app-release.apk');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     }
+  }
+
+  void _switchMockup() {
+    setState(() {
+      _currentMockup = (_currentMockup + 1) % _mockups.length;
+    });
   }
 
   @override
@@ -89,7 +78,16 @@ class _HeroSectionState extends State<HeroSection>
       children: [
         Expanded(flex: 5, child: _buildTextContent()),
         const SizedBox(width: 60),
-        Expanded(flex: 4, child: _buildPhoneMockup(mobile: false)),
+        Expanded(
+          flex: 5,
+          child: Row(
+            children: [
+              Expanded(child: _buildMockupImage(_mockups[0])),
+              const SizedBox(width: 24),
+              Expanded(child: _buildMockupImage(_mockups[1])),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -103,8 +101,39 @@ class _HeroSectionState extends State<HeroSection>
           children: [
             _buildTextContent(),
             const SizedBox(height: 40),
-            _buildPhoneMockup(mobile: true),
+            GestureDetector(
+              onTap: _switchMockup,
+              child: _buildMockupImage(_mockups[_currentMockup]),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Tap to switch view',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: AppColors.textMuted,
+              ),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMockupImage(String path) {
+    return Container(
+      constraints: const BoxConstraints(maxHeight: 520),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Image.asset(
+          path,
+          fit: BoxFit.contain,
+          errorBuilder: (_, __, ___) => Container(
+            height: 400,
+            color: AppColors.surface,
+            child: const Center(
+              child: Icon(Icons.phone_android_rounded, size: 64, color: AppColors.textMuted),
+            ),
+          ),
         ),
       ),
     );
@@ -179,90 +208,6 @@ class _HeroSectionState extends State<HeroSection>
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildPhoneMockup({bool mobile = false}) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isPhoneHovered = true),
-      onExit: (_) => setState(() => _isPhoneHovered = false),
-      child: AnimatedBuilder(
-        animation: _floatAnimation,
-        builder: (context, child) {
-          return Transform.translate(
-            offset: Offset(0, _floatAnimation.value),
-            child: child,
-          );
-        },
-        child: Container(
-          constraints: BoxConstraints(maxWidth: mobile ? 220 : 280),
-          height: mobile ? 400 : 560,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(mobile ? 28 : 40),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(
-                  alpha: _isPhoneHovered ? 0.3 : 0.15,
-                ),
-                blurRadius: _isPhoneHovered ? 80 : 40,
-                spreadRadius: _isPhoneHovered ? 20 : 10,
-                offset: const Offset(0, 20),
-              ),
-            ],
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(mobile ? 28 : 40),
-              border: Border.all(
-                color: AppColors.surfaceBorder.withValues(alpha: 0.3),
-                width: 1.5,
-              ),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(mobile ? 26 : 38),
-              child: Stack(
-                children: [
-                  Image.asset(
-                    'assets/screenshots/Screenshot_20260604-143245.png',
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: AppColors.surface,
-                      child: const Center(
-                        child: Icon(
-                          Icons.phone_android_rounded,
-                          size: 64,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      height: 28,
-                      decoration: const BoxDecoration(
-                        color: AppColors.background,
-                      ),
-                      child: Center(
-                        child: Container(
-                          width: 100,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: AppColors.textMuted.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

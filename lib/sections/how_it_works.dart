@@ -38,14 +38,15 @@ class HowItWorks extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: sectionKey,
-      color: AppColors.surface,
+      color: AppColors.lightSurface,
       child: SectionContainer(
         padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 24),
         child: Column(
           children: [
-            const SectionTitle(
+            SectionTitle(
               title: 'How It Works',
               subtitle: 'Getting your favorite food is just four simple steps.',
+              light: true,
             ),
             const SizedBox(height: 56),
             LayoutBuilder(
@@ -113,9 +114,16 @@ class _StepCard extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 240),
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: AppColors.lightBackground,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.surfaceBorder),
+        border: Border.all(color: AppColors.lightBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -126,7 +134,7 @@ class _StepCard extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primary.withValues(alpha: 0.2),
+                  AppColors.primary.withValues(alpha: 0.15),
                   AppColors.primary.withValues(alpha: 0.05),
                 ],
               ),
@@ -150,7 +158,7 @@ class _StepCard extends StatelessWidget {
             style: GoogleFonts.outfit(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: AppColors.lightTextPrimary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -159,7 +167,7 @@ class _StepCard extends StatelessWidget {
             step.description,
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: AppColors.textMuted,
+              color: AppColors.lightTextMuted,
               height: 1.4,
             ),
             textAlign: TextAlign.center,

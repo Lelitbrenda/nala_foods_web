@@ -30,16 +30,20 @@ class SectionContainer extends StatelessWidget {
 class SectionTitle extends StatelessWidget {
   final String title;
   final String? subtitle;
+  final bool light;
 
   const SectionTitle({
     super.key,
     required this.title,
     this.subtitle,
+    this.light = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final fontSize = responsiveFontSize(context, 28, 48);
+    final titleColor = light ? AppColors.lightTextPrimary : AppColors.textPrimary;
+    final subtitleColor = light ? AppColors.lightTextSecondary : AppColors.textSecondary;
     return Column(
       children: [
         Text(
@@ -47,7 +51,7 @@ class SectionTitle extends StatelessWidget {
           style: GoogleFonts.outfit(
             fontSize: fontSize,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: titleColor,
             height: 1.1,
           ),
           textAlign: TextAlign.center,
@@ -58,7 +62,7 @@ class SectionTitle extends StatelessWidget {
             subtitle!,
             style: GoogleFonts.inter(
               fontSize: 16,
-              color: AppColors.textSecondary,
+              color: subtitleColor,
               height: 1.6,
             ),
             textAlign: TextAlign.center,

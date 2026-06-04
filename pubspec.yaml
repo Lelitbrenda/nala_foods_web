@@ -25,6 +25,7 @@ flutter:
     - assets/Images/
     - assets/logo/
     - assets/screenshots/
+    - assets/mockups/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

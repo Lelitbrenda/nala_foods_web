@@ -47,7 +47,7 @@ class _ScreenshotsSectionState extends State<ScreenshotsSection> {
   Widget build(BuildContext context) {
     return Container(
       key: widget.sectionKey,
-      color: AppColors.background,
+      color: AppColors.lightBackground,
       child: SectionContainer(
         padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 24),
         child: Column(
@@ -55,6 +55,7 @@ class _ScreenshotsSectionState extends State<ScreenshotsSection> {
             const SectionTitle(
               title: 'See the App in Action',
               subtitle: 'A clean, intuitive interface designed for speed and simplicity.',
+              light: true,
             ),
             const SizedBox(height: 56),
             LayoutBuilder(
@@ -89,10 +90,11 @@ class _ScreenshotsSectionState extends State<ScreenshotsSection> {
   }
 
   Widget _buildCarouselLayout() {
+    final screenHeight = MediaQuery.of(context).size.height;
     return Column(
       children: [
         SizedBox(
-          height: 500,
+          height: (screenHeight * 0.6).clamp(400.0, 500.0),
           child: PageView.builder(
             itemCount: _screenshotsInfo.length,
             itemBuilder: (context, index) {
@@ -198,7 +200,7 @@ class _ScreenshotRowState extends State<_ScreenshotRow> {
               style: GoogleFonts.outfit(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: AppColors.lightTextPrimary,
                 height: 1.2,
               ),
             ),
@@ -207,7 +209,7 @@ class _ScreenshotRowState extends State<_ScreenshotRow> {
               widget.info.description,
               style: GoogleFonts.inter(
                 fontSize: 16,
-                color: AppColors.textSecondary,
+                color: AppColors.lightTextSecondary,
                 height: 1.6,
               ),
             ),
@@ -258,39 +260,34 @@ class _ScreenshotCardState extends State<_ScreenshotCard> {
           transform: _effectiveHovered
               ? (Matrix4.identity()..scale(1.03))
               : Matrix4.identity(),
-          constraints: const BoxConstraints(maxWidth: 300),
-          height: 560,
+          constraints: const BoxConstraints(maxWidth: 280),
+          height: 500,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(32),
+            color: AppColors.lightSurface,
+            border: Border.all(
+              color: AppColors.lightBorder.withValues(alpha: 0.5),
+              width: 1.5,
+            ),
             boxShadow: [
               BoxShadow(
                 color: _effectiveHovered
-                    ? AppColors.primary.withValues(alpha: 0.2)
-                    : Colors.black.withValues(alpha: 0.3),
-                blurRadius: _effectiveHovered ? 50 : 20,
-                spreadRadius: _effectiveHovered ? 10 : 0,
-                offset: const Offset(0, 10),
+                    ? AppColors.primary.withValues(alpha: 0.12)
+                    : Colors.black.withValues(alpha: 0.06),
+                blurRadius: _effectiveHovered ? 40 : 15,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(32),
-              border: Border.all(
-                color: AppColors.surfaceBorder.withValues(alpha: 0.3),
-                width: 1.5,
-              ),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: Image.asset(
-                widget.info.image,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  color: AppColors.surface,
-                  child: const Center(
-                    child: Icon(Icons.phone_android_rounded, size: 64, color: AppColors.textMuted),
-                  ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: Image.asset(
+              widget.info.image,
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => Container(
+                color: AppColors.grey100,
+                child: const Center(
+                  child: Icon(Icons.phone_android_rounded, size: 64, color: AppColors.grey),
                 ),
               ),
             ),

@@ -29,6 +29,25 @@ class AppColors {
 
   static const Color overlay = Color(0x99000000);
   static const Color glowOrange = Color(0x1AE8590C);
+
+  static const Color lightBackground = Color(0xFFFAF6F1);
+  static const Color lightSurface = Color(0xFFFFFFFF);
+  static const Color lightSurfaceLight = Color(0xFFFFF5F0);
+  static const Color lightBorder = Color(0xFFEDE7DD);
+  static const Color lightTextPrimary = Color(0xFF3E2723);
+  static const Color lightTextSecondary = Color(0xFF6D4C41);
+  static const Color lightTextMuted = Color(0xFFA1887F);
+  static const Color lightTextOnPrimary = Colors.white;
+  static const Color lightPrimarySoft = Color(0xFFFFEDD5);
+
+  static const Color grey = Color(0xFF9E9E9E);
+  static const Color greyLight = Color(0xFFFAFAFA);
+  static const Color grey100 = Color(0xFFF5F5F5);
+  static const Color grey200 = Color(0xFFEEEEEE);
+  static const Color grey300 = Color(0xFFE0E0E0);
+  static const Color grey600 = Color(0xFF757575);
+  static const Color grey700 = Color(0xFF616161);
+  static const Color amber = Color(0xFFFFB300);
 }
 
 class AppTheme {

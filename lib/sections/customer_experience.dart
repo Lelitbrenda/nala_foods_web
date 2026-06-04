@@ -32,7 +32,7 @@ class CustomerExperience extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: sectionKey,
-      color: AppColors.background,
+      color: AppColors.lightBackground,
       child: SectionContainer(
         padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 24),
         child: Column(
@@ -40,6 +40,7 @@ class CustomerExperience extends StatelessWidget {
             const SectionTitle(
               title: 'Designed for You',
               subtitle: 'Every feature is built with the customer experience in mind.',
+              light: true,
             ),
             const SizedBox(height: 56),
             LayoutBuilder(
@@ -101,6 +102,9 @@ class _ExperienceRowState extends State<_ExperienceRow> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final imageHeight = (screenHeight * 0.65).clamp(400.0, 520.0);
+
     final imageWidget = MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -110,17 +114,18 @@ class _ExperienceRowState extends State<_ExperienceRow> {
             ? (Matrix4.identity()..scale(1.02))
             : Matrix4.identity(),
         constraints: const BoxConstraints(maxWidth: 280),
-        height: 520,
+        height: imageHeight,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(32),
+          color: AppColors.lightSurface,
           border: Border.all(
-            color: AppColors.surfaceBorder.withValues(alpha: 0.3),
+            color: AppColors.lightBorder.withValues(alpha: 0.5),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
               color: AppColors.primary.withValues(
-                alpha: _isHovered ? 0.15 : 0.05,
+                alpha: _isHovered ? 0.1 : 0.03,
               ),
               blurRadius: 40,
               offset: const Offset(0, 20),
@@ -131,11 +136,11 @@ class _ExperienceRowState extends State<_ExperienceRow> {
           borderRadius: BorderRadius.circular(30),
           child: Image.asset(
             widget.experience.image,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
             errorBuilder: (_, __, ___) => Container(
-              color: AppColors.surface,
+              color: AppColors.grey100,
               child: const Center(
-                child: Icon(Icons.phone_android_rounded, size: 64, color: AppColors.textMuted),
+                child: Icon(Icons.phone_android_rounded, size: 64, color: AppColors.grey),
               ),
             ),
           ),
@@ -162,7 +167,7 @@ class _ExperienceRowState extends State<_ExperienceRow> {
           style: GoogleFonts.outfit(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: AppColors.lightTextPrimary,
             height: 1.2,
           ),
         ),
@@ -171,7 +176,7 @@ class _ExperienceRowState extends State<_ExperienceRow> {
           widget.experience.description,
           style: GoogleFonts.inter(
             fontSize: 16,
-            color: AppColors.textSecondary,
+            color: AppColors.lightTextSecondary,
             height: 1.6,
           ),
         ),
@@ -194,27 +199,38 @@ class _ExperienceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final imageHeight = (screenHeight * 0.55).clamp(320.0, 460.0);
+
     return Column(
       children: [
         Container(
           constraints: const BoxConstraints(maxWidth: 280),
-          height: 460,
+          height: imageHeight,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(32),
+            color: AppColors.lightSurface,
             border: Border.all(
-              color: AppColors.surfaceBorder.withValues(alpha: 0.3),
+              color: AppColors.lightBorder.withValues(alpha: 0.5),
               width: 1.5,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30),
             child: Image.asset(
               experience.image,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
               errorBuilder: (_, __, ___) => Container(
-                color: AppColors.surface,
+                color: AppColors.grey100,
                 child: const Center(
-                  child: Icon(Icons.phone_android_rounded, size: 64, color: AppColors.textMuted),
+                  child: Icon(Icons.phone_android_rounded, size: 64, color: AppColors.grey),
                 ),
               ),
             ),
@@ -236,7 +252,7 @@ class _ExperienceCard extends StatelessWidget {
           style: GoogleFonts.outfit(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: AppColors.lightTextPrimary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -245,7 +261,7 @@ class _ExperienceCard extends StatelessWidget {
           experience.description,
           style: GoogleFonts.inter(
             fontSize: 14,
-            color: AppColors.textMuted,
+            color: AppColors.lightTextMuted,
             height: 1.6,
           ),
           textAlign: TextAlign.center,

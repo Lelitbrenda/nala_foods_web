@@ -44,14 +44,15 @@ class FeaturesSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: sectionKey,
-      color: AppColors.background,
+      color: AppColors.lightBackground,
       child: SectionContainer(
         padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 24),
         child: Column(
           children: [
-            const SectionTitle(
+            SectionTitle(
               title: 'Everything You Need',
               subtitle: 'Designed to make food discovery and ordering effortless.',
+              light: true,
             ),
             const SizedBox(height: 56),
             LayoutBuilder(
@@ -118,18 +119,18 @@ class _FeatureCardState extends State<_FeatureCard> {
             : Matrix4.identity(),
         padding: const EdgeInsets.all(28),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: AppColors.lightSurface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: _isHovered
                 ? AppColors.primary.withValues(alpha: 0.3)
-                : AppColors.surfaceBorder,
+                : AppColors.lightBorder,
           ),
           boxShadow: [
             BoxShadow(
               color: _isHovered
-                  ? AppColors.primary.withValues(alpha: 0.1)
-                  : Colors.black.withValues(alpha: 0.2),
+                  ? AppColors.primary.withValues(alpha: 0.08)
+                  : Colors.black.withValues(alpha: 0.04),
               blurRadius: _isHovered ? 30 : 10,
               offset: const Offset(0, 8),
             ),
@@ -144,13 +145,13 @@ class _FeatureCardState extends State<_FeatureCard> {
               height: 56,
               decoration: BoxDecoration(
                 color: _isHovered
-                    ? AppColors.primary.withValues(alpha: 0.15)
-                    : AppColors.surfaceLight,
+                    ? AppColors.primary.withValues(alpha: 0.12)
+                    : AppColors.lightSurfaceLight,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(
                 widget.feature.icon,
-                color: _isHovered ? AppColors.primary : AppColors.textSecondary,
+                color: _isHovered ? AppColors.primary : AppColors.lightTextMuted,
                 size: 28,
               ),
             ),
@@ -160,7 +161,7 @@ class _FeatureCardState extends State<_FeatureCard> {
               style: GoogleFonts.outfit(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: _isHovered ? AppColors.primary : AppColors.textPrimary,
+                color: _isHovered ? AppColors.primary : AppColors.lightTextPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -169,7 +170,7 @@ class _FeatureCardState extends State<_FeatureCard> {
               widget.feature.description,
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: AppColors.textMuted,
+                color: AppColors.lightTextMuted,
                 height: 1.5,
               ),
               textAlign: TextAlign.center,

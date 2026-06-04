@@ -31,7 +31,7 @@ class RestaurantSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: sectionKey,
-      color: AppColors.surface,
+      color: AppColors.lightSurface,
       child: SectionContainer(
         padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 24),
         child: LayoutBuilder(
@@ -69,12 +69,12 @@ class RestaurantSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text(
+        Text(
           'Built for\nRestaurants',
-          style: TextStyle(
+          style: GoogleFonts.outfit(
             fontSize: 36,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: AppColors.lightTextPrimary,
             height: 1.1,
           ),
         ),
@@ -83,7 +83,7 @@ class RestaurantSection extends StatelessWidget {
           'Powerful tools to help you manage orders, reach more customers, and grow your business.',
           style: GoogleFonts.inter(
             fontSize: 16,
-            color: AppColors.textSecondary,
+            color: AppColors.lightTextSecondary,
             height: 1.6,
           ),
         ),
@@ -151,7 +151,7 @@ class _BenefitRow extends StatelessWidget {
                 style: GoogleFonts.outfit(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: AppColors.lightTextPrimary,
                 ),
               ),
               const SizedBox(height: 4),
@@ -159,7 +159,7 @@ class _BenefitRow extends StatelessWidget {
                 benefit.description,
                 style: GoogleFonts.inter(
                   fontSize: 14,
-                  color: AppColors.textMuted,
+                  color: AppColors.lightTextMuted,
                   height: 1.5,
                 ),
               ),
@@ -190,14 +190,15 @@ class _DashboardPreviewState extends State<_DashboardPreview> {
             ? (Matrix4.identity()..scale(1.02))
             : Matrix4.identity(),
         constraints: const BoxConstraints(maxWidth: 500),
-        height: 400,
+        height: 420,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: AppColors.surfaceBorder),
+          color: AppColors.lightBackground,
+          border: Border.all(color: AppColors.lightBorder),
           boxShadow: [
             BoxShadow(
               color: AppColors.primary.withValues(
-                alpha: _isHovered ? 0.15 : 0.05,
+                alpha: _isHovered ? 0.1 : 0.03,
               ),
               blurRadius: 40,
               offset: const Offset(0, 20),
@@ -208,17 +209,17 @@ class _DashboardPreviewState extends State<_DashboardPreview> {
           borderRadius: BorderRadius.circular(23),
           child: Image.asset(
             'assets/screenshots/Screenshot_20260604-143638.png',
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
             errorBuilder: (_, __, ___) => Container(
-              color: AppColors.surfaceLight,
+              color: AppColors.grey100,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.dashboard_rounded, size: 64, color: AppColors.textMuted),
+                  Icon(Icons.dashboard_rounded, size: 64, color: AppColors.grey),
                   const SizedBox(height: 16),
                   Text(
                     'Restaurant Dashboard',
-                    style: GoogleFonts.inter(color: AppColors.textMuted),
+                    style: GoogleFonts.inter(color: AppColors.grey),
                   ),
                 ],
               ),
