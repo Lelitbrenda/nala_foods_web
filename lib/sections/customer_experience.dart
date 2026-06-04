@@ -103,7 +103,7 @@ class _ExperienceRowState extends State<_ExperienceRow> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final imageHeight = (screenHeight * 0.65).clamp(400.0, 520.0);
+    final imageHeight = (screenHeight * 0.55).clamp(300.0, 520.0);
 
     final imageWidget = MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -200,7 +200,7 @@ class _ExperienceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final imageHeight = (screenHeight * 0.55).clamp(320.0, 460.0);
+    final imageHeight = (screenHeight * 0.5).clamp(260.0, 460.0);
 
     return Column(
       children: [

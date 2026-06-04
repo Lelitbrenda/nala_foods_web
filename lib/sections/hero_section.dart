@@ -120,15 +120,17 @@ class _HeroSectionState extends State<HeroSection> {
   }
 
   Widget _buildMockupImage(String path) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final mockupHeight = (screenHeight * 0.55).clamp(280.0, 520.0);
     return Container(
-      constraints: const BoxConstraints(maxHeight: 520),
+      constraints: BoxConstraints(maxHeight: mockupHeight),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: Image.asset(
           path,
           fit: BoxFit.contain,
           errorBuilder: (_, __, ___) => Container(
-            height: 400,
+            height: mockupHeight,
             color: AppColors.surface,
             child: const Center(
               child: Icon(Icons.phone_android_rounded, size: 64, color: AppColors.textMuted),
@@ -171,7 +173,7 @@ class _HeroSectionState extends State<HeroSection> {
         Text(
           'Discover Local\nRestaurants and\nOrder with Ease',
           style: GoogleFonts.outfit(
-            fontSize: responsiveFontSize(context, 40, 72),
+            fontSize: responsiveFontSize(context, 26, 72),
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
             height: 1.05,

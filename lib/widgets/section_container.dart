@@ -14,9 +14,10 @@ class SectionContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 768;
     return Container(
       width: double.infinity,
-      padding: padding ?? const EdgeInsets.symmetric(vertical: 80, horizontal: 24),
+      padding: padding ?? EdgeInsets.symmetric(vertical: isMobile ? 48 : 80, horizontal: 24),
       child: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 1400),
@@ -41,7 +42,7 @@ class SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fontSize = responsiveFontSize(context, 28, 48);
+    final fontSize = responsiveFontSize(context, 22, 48);
     final titleColor = light ? AppColors.lightTextPrimary : AppColors.textPrimary;
     final subtitleColor = light ? AppColors.lightTextSecondary : AppColors.textSecondary;
     return Column(

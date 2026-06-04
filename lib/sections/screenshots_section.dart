@@ -94,7 +94,7 @@ class _ScreenshotsSectionState extends State<ScreenshotsSection> {
     return Column(
       children: [
         SizedBox(
-          height: (screenHeight * 0.6).clamp(400.0, 500.0),
+          height: (screenHeight * 0.5).clamp(300.0, 500.0),
           child: PageView.builder(
             itemCount: _screenshotsInfo.length,
             itemBuilder: (context, index) {
@@ -250,6 +250,8 @@ class _ScreenshotCardState extends State<_ScreenshotCard> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final cardHeight = (screenHeight * 0.5).clamp(320.0, 500.0);
     return MouseRegion(
       onEnter: (_) => setState(() => _localHovered = true),
       onExit: (_) => setState(() => _localHovered = false),
@@ -261,7 +263,7 @@ class _ScreenshotCardState extends State<_ScreenshotCard> {
               ? (Matrix4.identity()..scale(1.03))
               : Matrix4.identity(),
           constraints: const BoxConstraints(maxWidth: 280),
-          height: 500,
+          height: cardHeight,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(32),
             color: AppColors.lightSurface,

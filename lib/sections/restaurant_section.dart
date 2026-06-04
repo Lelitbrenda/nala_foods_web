@@ -181,6 +181,8 @@ class _DashboardPreviewState extends State<_DashboardPreview> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final dashHeight = (screenHeight * 0.55).clamp(280.0, 420.0);
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -190,7 +192,7 @@ class _DashboardPreviewState extends State<_DashboardPreview> {
             ? (Matrix4.identity()..scale(1.02))
             : Matrix4.identity(),
         constraints: const BoxConstraints(maxWidth: 500),
-        height: 420,
+        height: dashHeight,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
           color: AppColors.lightBackground,

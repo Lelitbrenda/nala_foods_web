@@ -19,9 +19,11 @@ class NavBar extends StatefulWidget {
   State<NavBar> createState() => _NavBarState();
 }
 
-class _NavBarState extends State<NavBar> {
+class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
   bool _isScrolled = false;
   bool _isMobileOpen = false;
+  late AnimationController _drawerController;
+  late Animation<Offset> _drawerSlide;
 
   static const List<_NavItem> _navItems = [
     _NavItem('Home', 'home'),
@@ -34,11 +36,23 @@ class _NavBarState extends State<NavBar> {
   void initState() {
     super.initState();
     widget.scrollController.addListener(_onScroll);
+    _drawerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _drawerSlide = Tween<Offset>(
+      begin: const Offset(1.0, 0.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _drawerController,
+      curve: Curves.easeOutCubic,
+    ));
   }
 
   @override
   void dispose() {
     widget.scrollController.removeListener(_onScroll);
+    _drawerController.dispose();
     super.dispose();
   }
 
@@ -49,8 +63,25 @@ class _NavBarState extends State<NavBar> {
     }
   }
 
+  void _toggleDrawer() {
+    if (_isMobileOpen) {
+      _drawerController.reverse();
+      setState(() => _isMobileOpen = false);
+    } else {
+      setState(() => _isMobileOpen = true);
+      _drawerController.forward();
+    }
+  }
+
+  void _closeDrawer() {
+    if (_isMobileOpen) {
+      _drawerController.reverse();
+      setState(() => _isMobileOpen = false);
+    }
+  }
+
   void _scrollTo(String section) {
-    setState(() => _isMobileOpen = false);
+    _closeDrawer();
     final key = widget.sectionKeys[section];
     if (key == null || key.currentContext == null) return;
 
@@ -71,6 +102,18 @@ class _NavBarState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth > 900;
+        if (isWide) {
+          return _buildDesktopNav();
+        }
+        return _buildMobileNav(context);
+      },
+    );
+  }
+
+  Widget _buildDesktopNav() {
     return Container(
       height: _isScrolled ? 70 : 90,
       decoration: BoxDecoration(
@@ -86,92 +129,208 @@ class _NavBarState extends State<NavBar> {
         ),
       ),
       child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: MediaQuery.of(context).size.width > 768 ? 48 : 16,
-        ),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final isWide = constraints.maxWidth > 768;
-            return isWide ? _buildDesktopNav() : _buildMobileNav();
-          },
+        padding: const EdgeInsets.symmetric(horizontal: 48),
+        child: Row(
+          children: [
+            Image.asset(
+              'assets/logo/logo19.png',
+              height: _isScrolled ? 36 : 40,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 48),
+            ..._navItems.map((item) {
+              final isActive = widget.activeSection == item.key;
+              return _NavLink(
+                label: item.label,
+                isActive: isActive,
+                onTap: () => _scrollTo(item.key),
+              );
+            }),
+            const Spacer(),
+            _buildDownloadButton(),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildDesktopNav() {
-    return Row(
-      children: [
-        Image.asset(
-          'assets/logo/logo19.png',
-          height: _isScrolled ? 36 : 40,
-          fit: BoxFit.contain,
-        ),
-        const SizedBox(width: 48),
-        ..._navItems.map((item) {
-          final isActive = widget.activeSection == item.key;
-          return _NavLink(
-            label: item.label,
-            isActive: isActive,
-            onTap: () => _scrollTo(item.key),
-          );
-        }),
-        const Spacer(),
-        _buildDownloadButtonDesktop(),
-      ],
+  Widget _buildMobileNav(BuildContext context) {
+    final navbarHeight = _isScrolled ? 70.0 : 90.0;
+    return SizedBox(
+      height: _isMobileOpen ? MediaQuery.of(context).size.height : navbarHeight,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: navbarHeight,
+            decoration: BoxDecoration(
+              color: _isScrolled || _isMobileOpen
+                  ? const Color(0xF20F0F0F)
+                  : Colors.transparent,
+              border: Border(
+                bottom: BorderSide(
+                  color: _isScrolled
+                      ? AppColors.border.withValues(alpha: 0.15)
+                      : Colors.transparent,
+                ),
+              ),
+            ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Image.asset(
+                    'assets/logo/logo19.png',
+                    height: 36,
+                    fit: BoxFit.contain,
+                  ),
+                  const Spacer(),
+                  SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: IconButton(
+                      icon: Icon(
+                        _isMobileOpen ? Icons.close : Icons.menu_rounded,
+                        color: AppColors.textPrimary,
+                        size: 24,
+                      ),
+                      onPressed: _toggleDrawer,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (_isMobileOpen)
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: _closeDrawer,
+                      child: Container(color: Colors.black54),
+                    ),
+                  ),
+                  SlideTransition(
+                    position: _drawerSlide,
+                    child: Container(
+                      width: 280,
+                      color: AppColors.surface,
+                      child: SafeArea(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 24),
+                            ..._navItems.map((item) {
+                              final isActive = widget.activeSection == item.key;
+                              return _DrawerItem(
+                                label: item.label,
+                                isActive: isActive,
+                                onTap: () => _scrollTo(item.key),
+                              );
+                            }),
+                            const Spacer(),
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: _buildDownloadButton(),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
     );
   }
 
-  Widget _buildMobileNav() {
-    return Column(
-      children: [
-        Expanded(
+  Widget _buildDownloadButton() {
+    return ElevatedButton(
+      onPressed: _downloadApk,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 0,
+        textStyle: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.download_rounded, size: 18),
+          SizedBox(width: 8),
+          Text('Download App'),
+        ],
+      ),
+    );
+  }
+}
+
+class _DrawerItem extends StatefulWidget {
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _DrawerItem({
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  State<_DrawerItem> createState() => _DrawerItemState();
+}
+
+class _DrawerItemState extends State<_DrawerItem> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 48),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          color: widget.isActive
+              ? AppColors.primary.withValues(alpha: 0.08)
+              : Colors.transparent,
           child: Row(
             children: [
-              Image.asset(
-                'assets/logo/logo19.png',
-                height: 36,
-                fit: BoxFit.contain,
-              ),
-              const Spacer(),
-              SizedBox(
-                width: 48,
-                height: 48,
-                child: IconButton(
-                  icon: Icon(
-                    _isMobileOpen ? Icons.close : Icons.menu_rounded,
-                    color: AppColors.textPrimary,
-                    size: 24,
+              if (widget.isActive)
+                Container(
+                  width: 3,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                  onPressed: () => setState(() => _isMobileOpen = !_isMobileOpen),
+                )
+              else
+                const SizedBox(width: 3),
+              const SizedBox(width: 16),
+              Text(
+                widget.label,
+                style: GoogleFonts.inter(
+                  fontSize: 17,
+                  fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w400,
+                  color: widget.isActive
+                      ? AppColors.primary
+                      : (_isHovered ? AppColors.primary : AppColors.textSecondary),
                 ),
               ),
             ],
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDownloadButtonDesktop() {
-    return MouseRegion(
-      child: ElevatedButton(
-        onPressed: _downloadApk,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 0,
-          textStyle: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600),
-        ),
-        child: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.download_rounded, size: 18),
-            SizedBox(width: 8),
-            Text('Download App'),
-          ],
         ),
       ),
     );
