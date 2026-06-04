@@ -14,7 +14,7 @@ class NalaFoodsApp extends StatelessWidget {
     return MaterialApp(
       title: 'Nala Foods',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
+      theme: AppTheme.darkTheme,
       home: const LandingPage(),
     );
   }

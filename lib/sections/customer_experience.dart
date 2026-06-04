@@ -1,251 +1,256 @@
-import 'dart:html' as html;
-import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
-import '../data.dart';
+import '../widgets/section_container.dart';
 
 class CustomerExperience extends StatelessWidget {
-  const CustomerExperience({super.key});
+  final GlobalKey? sectionKey;
+  const CustomerExperience({super.key, this.sectionKey});
+
+  static const List<_ExperienceData> _experiences = [
+    _ExperienceData(
+      icon: Icons.shopping_bag_rounded,
+      title: 'Seamless Ordering',
+      description: 'Place your order in seconds. Our intuitive interface makes it easy to find what you want, customize your meal, and checkout without any hassle.',
+      image: 'assets/screenshots/Screenshot_20260604-143327.png',
+    ),
+    _ExperienceData(
+      icon: Icons.map_rounded,
+      title: 'Easy Discovery',
+      description: 'Find new restaurants and dishes you will love. Our smart recommendations help you discover hidden gems in your neighborhood.',
+      image: 'assets/screenshots/Screenshot_20260604-143352.png',
+    ),
+    _ExperienceData(
+      icon: Icons.chat_bubble_rounded,
+      title: 'Direct Communication',
+      description: 'Chat directly with restaurants for special requests, dietary questions, or order modifications. No middlemen, just direct conversation.',
+      image: 'assets/screenshots/Screenshot_20260604-143245.png',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
+    return Container(
+      key: sectionKey,
+      color: AppColors.background,
+      child: SectionContainer(
+        padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 24),
+        child: Column(
+          children: [
+            const SectionTitle(
+              title: 'Designed for You',
+              subtitle: 'Every feature is built with the customer experience in mind.',
+            ),
+            const SizedBox(height: 56),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth > 768;
+                return Column(
+                  children: List.generate(_experiences.length, (index) {
+                    final isReversed = index.isOdd;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 60),
+                      child: isWide
+                          ? _ExperienceRow(
+                              experience: _experiences[index],
+                              isReversed: isReversed,
+                            )
+                          : _ExperienceCard(
+                              experience: _experiences[index],
+                            ),
+                    );
+                  }),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ExperienceData {
+  final IconData icon;
+  final String title;
+  final String description;
+  final String image;
+  const _ExperienceData({
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.image,
+  });
+}
+
+class _ExperienceRow extends StatefulWidget {
+  final _ExperienceData experience;
+  final bool isReversed;
+
+  const _ExperienceRow({
+    required this.experience,
+    required this.isReversed,
+  });
+
+  @override
+  State<_ExperienceRow> createState() => _ExperienceRowState();
+}
+
+class _ExperienceRowState extends State<_ExperienceRow> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final imageWidget = MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 400),
+        transform: _isHovered
+            ? (Matrix4.identity()..scale(1.02))
+            : Matrix4.identity(),
+        constraints: const BoxConstraints(maxWidth: 280),
+        height: 520,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(32),
+          border: Border.all(
+            color: AppColors.surfaceBorder.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(
+                alpha: _isHovered ? 0.15 : 0.05,
+              ),
+              blurRadius: 40,
+              offset: const Offset(0, 20),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(30),
           child: Image.asset(
-            'assets/Images/20260515_122857.jpg',
+            widget.experience.image,
             fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Container(
+              color: AppColors.surface,
+              child: const Center(
+                child: Icon(Icons.phone_android_rounded, size: 64, color: AppColors.textMuted),
+              ),
+            ),
           ),
         ),
-        Positioned.fill(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-            child: Container(color: Colors.black.withValues(alpha: 0.45)),
+      ),
+    );
+
+    final textWidget = Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Icon(widget.experience.icon, color: AppColors.primary, size: 24),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          widget.experience.title,
+          style: GoogleFonts.outfit(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+            height: 1.2,
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 24),
-          child: Column(
-            children: [
-              const Text(
-                'Popular Restaurants',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Explore top-rated restaurants in your area',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white.withValues(alpha: 0.7),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 40),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final isWide = constraints.maxWidth > 700;
-                  if (isWide) {
-                    return _buildGrid(context);
-                  }
-                  return _buildCarousel(context);
-                },
-              ),
-            ],
+        const SizedBox(height: 16),
+        Text(
+          widget.experience.description,
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            color: AppColors.textSecondary,
+            height: 1.6,
           ),
         ),
       ],
     );
-  }
 
-  Widget _buildGrid(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 1.0,
-        crossAxisSpacing: 20,
-        mainAxisSpacing: 20,
-      ),
-      itemCount: 3,
-      itemBuilder: (context, index) => _RestaurantCard(restaurant: restaurants[index]),
-    );
-  }
-
-  Widget _buildCarousel(BuildContext context) {
-    return SizedBox(
-      height: 360,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: 3,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        itemBuilder: (context, index) => Padding(
-          padding: const EdgeInsets.only(right: 16),
-          child: SizedBox(
-            width: 280,
-            child: _RestaurantCard(restaurant: restaurants[index]),
-          ),
-        ),
-      ),
+    return Row(
+      children: [
+        Expanded(child: widget.isReversed ? textWidget : imageWidget),
+        const SizedBox(width: 48),
+        Expanded(child: widget.isReversed ? imageWidget : textWidget),
+      ],
     );
   }
 }
 
-class _RestaurantCard extends StatefulWidget {
-  final RestaurantData restaurant;
-
-  const _RestaurantCard({required this.restaurant});
-
-  @override
-  State<_RestaurantCard> createState() => _RestaurantCardState();
-}
-
-class _RestaurantCardState extends State<_RestaurantCard> {
-  bool _isHovered = false;
-
-  void _orderNow() {
-    final anchor = html.AnchorElement(href: '/apk/app-release.apk')
-      ..download = 'NalaFoods.apk';
-    anchor.click();
-  }
+class _ExperienceCard extends StatelessWidget {
+  final _ExperienceData experience;
+  const _ExperienceCard({required this.experience});
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        transform: _isHovered ? (Matrix4.identity()..translate(0, -8)) : Matrix4.identity(),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: _isHovered ? 0.12 : 0.06),
-              blurRadius: _isHovered ? 30 : 16,
-              offset: Offset(0, _isHovered ? 12 : 6),
+    return Column(
+      children: [
+        Container(
+          constraints: const BoxConstraints(maxWidth: 280),
+          height: 460,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(
+              color: AppColors.surfaceBorder.withValues(alpha: 0.3),
+              width: 1.5,
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 3,
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.asset(
-                      widget.restaurant.image,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        color: AppColors.grey200,
-                        child: const Icon(Icons.restaurant, size: 48, color: AppColors.grey),
-                      ),
-                    ),
-                    Positioned(
-                      top: 12,
-                      right: 12,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.9),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.star, size: 14, color: AppColors.amber),
-                            const SizedBox(width: 4),
-                            Text(
-                              widget.restaurant.rating.toString(),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: Image.asset(
+              experience.image,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(
+                color: AppColors.surface,
+                child: const Center(
+                  child: Icon(Icons.phone_android_rounded, size: 64, color: AppColors.textMuted),
                 ),
               ),
             ),
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.restaurant.name,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: AppColors.primarySoft,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            widget.restaurant.category,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: AppColors.primaryDark,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Icon(Icons.access_time_rounded, size: 13, color: AppColors.textMuted),
-                        const SizedBox(width: 4),
-                        Text(
-                          widget.restaurant.deliveryTime,
-                          style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _orderNow,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          elevation: 0,
-                        ),
-                        child: const Text('Order Now', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+        const SizedBox(height: 24),
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Icon(experience.icon, color: AppColors.primary, size: 24),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          experience.title,
+          style: GoogleFonts.outfit(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 12),
+        Text(
+          experience.description,
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            color: AppColors.textMuted,
+            height: 1.6,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }

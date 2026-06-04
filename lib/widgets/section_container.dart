@@ -1,87 +1,89 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 
 class SectionContainer extends StatelessWidget {
   final Widget child;
-  final EdgeInsets? padding;
-  final Color? backgroundColor;
-  final bool useMaxWidth;
+  final EdgeInsetsGeometry? padding;
 
   const SectionContainer({
     super.key,
     required this.child,
     this.padding,
-    this.backgroundColor,
-    this.useMaxWidth = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: backgroundColor,
-      child: useMaxWidth
-          ? Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 800),
-                child: Padding(
-                  padding: padding ?? const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
-                  child: child,
-                ),
-              ),
-            )
-          : Padding(
-              padding: padding ?? const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
-              child: child,
-            ),
+      padding: padding ?? const EdgeInsets.symmetric(vertical: 80, horizontal: 24),
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 1400),
+          child: child,
+        ),
+      ),
     );
   }
 }
 
-class AnimatedSection extends StatefulWidget {
-  final Widget child;
-  final double fadeOffset;
+class SectionTitle extends StatelessWidget {
+  final String title;
+  final String? subtitle;
 
-  const AnimatedSection({
+  const SectionTitle({
     super.key,
-    required this.child,
-    this.fadeOffset = 30,
+    required this.title,
+    this.subtitle,
   });
 
   @override
-  State<AnimatedSection> createState() => _AnimatedSectionState();
+  Widget build(BuildContext context) {
+    final fontSize = responsiveFontSize(context, 28, 48);
+    return Column(
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.outfit(
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+            height: 1.1,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        if (subtitle != null) ...[
+          const SizedBox(height: 12),
+          Text(
+            subtitle!,
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              color: AppColors.textSecondary,
+              height: 1.6,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ],
+    );
+  }
 }
 
-class _AnimatedSectionState extends State<AnimatedSection> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
-    _slideAnimation = Tween<Offset>(begin: Offset(0, 0.1), end: Offset.zero).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+class GradientDivider extends StatelessWidget {
+  const GradientDivider({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: SlideTransition(
-        position: _slideAnimation,
-        child: widget.child,
+    return Container(
+      height: 1,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.transparent,
+            AppColors.primary.withValues(alpha: 0.3),
+            Colors.transparent,
+          ],
+        ),
       ),
     );
   }

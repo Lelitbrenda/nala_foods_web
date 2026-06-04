@@ -1,91 +1,85 @@
-import 'dart:html' as html;
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
+import '../widgets/buttons.dart';
 
-class HeroSection extends StatelessWidget {
-  const HeroSection({super.key});
+class HeroSection extends StatefulWidget {
+  final GlobalKey? heroKey;
+  const HeroSection({super.key, this.heroKey});
 
-  void _downloadApk() {
-    final anchor = html.AnchorElement(href: '/apk/app-release.apk')
-      ..download = 'NalaFoods.apk';
-    anchor.click();
+  @override
+  State<HeroSection> createState() => _HeroSectionState();
+}
+
+class _HeroSectionState extends State<HeroSection>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _floatController;
+  late Animation<double> _floatAnimation;
+  bool _isPhoneHovered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _floatController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+    _floatAnimation = Tween<double>(begin: -8, end: 8).animate(
+      CurvedAnimation(parent: _floatController, curve: Curves.easeInOutSine),
+    );
+  }
+
+  @override
+  void dispose() {
+    _floatController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _downloadApk() async {
+    final uri = Uri.parse('/apk/app-release.apk');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      height: 700,
+      key: widget.heroKey,
+      height: screenHeight * 0.9,
       width: double.infinity,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/Images/20260515_122857.jpg',
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(color: AppColors.accent),
-            ),
-          ),
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppColors.accent.withValues(alpha: 0.85),
-                    AppColors.accent.withValues(alpha: 0.6),
-                    Colors.transparent,
-                    AppColors.accent.withValues(alpha: 0.4),
-                  ],
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.background,
+            const Color(0xFF0A0A0A),
+            AppColors.background,
+          ],
+        ),
+      ),
+      child: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth > 800;
+            return Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: isWide ? 48 : 16,
+              ),
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 1400),
+                  child: isWide
+                      ? _buildDesktopLayout()
+                      : _buildMobileLayout(screenHeight * 0.85),
                 ),
               ),
-            ),
-          ),
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 200,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    AppColors.accent.withValues(alpha: 0.6),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-          SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final isWide = constraints.maxWidth > 800;
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
-                  child: isWide ? _buildDesktopLayout() : _buildMobileLayout(),
-                );
-              },
-            ),
-          ),
-          Positioned(
-            top: 140,
-            right: 100,
-            child: _buildFloatingBadge(Icons.timer_outlined, '25-35 min', 'Avg. Delivery'),
-          ),
-          Positioned(
-            top: 300,
-            right: 60,
-            child: _buildFloatingBadge(Icons.star_rounded, '4.8 ★', 'Top Rated'),
-          ),
-          Positioned(
-            bottom: 120,
-            right: 120,
-            child: _buildFloatingBadge(Icons.local_fire_department_rounded, 'Popular', 'Trending Now'),
-          ),
-        ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -93,27 +87,26 @@ class HeroSection extends StatelessWidget {
   Widget _buildDesktopLayout() {
     return Row(
       children: [
-        Expanded(
-          flex: 5,
-          child: _buildTextContent(),
-        ),
-        const SizedBox(width: 40),
-        Expanded(
-          flex: 4,
-          child: _buildPhoneMockup(),
-        ),
+        Expanded(flex: 5, child: _buildTextContent()),
+        const SizedBox(width: 60),
+        Expanded(flex: 4, child: _buildPhoneMockup(mobile: false)),
       ],
     );
   }
 
-  Widget _buildMobileLayout() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildTextContent(),
-        const SizedBox(height: 32),
-        _buildPhoneMockup(),
-      ],
+  Widget _buildMobileLayout(double availableHeight) {
+    return SingleChildScrollView(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: availableHeight),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildTextContent(),
+            const SizedBox(height: 40),
+            _buildPhoneMockup(mobile: true),
+          ],
+        ),
+      ),
     );
   }
 
@@ -122,23 +115,21 @@ class HeroSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Image.asset('assets/logo/logo19.png', height: 120, fit: BoxFit.contain),
-        const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.2),
+            color: AppColors.primarySoft,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
           ),
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.restaurant, size: 16, color: AppColors.primary),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
-                'Now Available in Your Area',
-                style: TextStyle(
+                'Discover & Order',
+                style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primary,
@@ -148,12 +139,12 @@ class HeroSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 28),
-        const Text(
-          'Good Food,\nGreat Mood',
-          style: TextStyle(
-            fontSize: 56,
+        Text(
+          'Discover Local\nRestaurants and\nOrder with Ease',
+          style: GoogleFonts.outfit(
+            fontSize: responsiveFontSize(context, 40, 72),
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: AppColors.textPrimary,
             height: 1.05,
             letterSpacing: -1.5,
           ),
@@ -162,10 +153,10 @@ class HeroSection extends StatelessWidget {
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 480),
           child: Text(
-            'Discover local restaurants, order meals fast, and enjoy your favorite dishes anytime.',
-            style: TextStyle(
+            'Browse menus, connect with restaurants, and enjoy a smarter food ordering experience.',
+            style: GoogleFonts.inter(
               fontSize: 18,
-              color: Colors.white.withValues(alpha: 0.85),
+              color: AppColors.textSecondary,
               height: 1.6,
             ),
           ),
@@ -175,158 +166,102 @@ class HeroSection extends StatelessWidget {
           spacing: 16,
           runSpacing: 12,
           children: [
-            _buildPrimaryButton('Order Now', Icons.shopping_bag_rounded, _downloadApk),
-            _buildSecondaryButton('Explore Restaurants', Icons.explore_rounded, () {
-              // Will scroll to restaurants section via nav
-            }),
+            CtaButton(
+              label: 'Download for Android',
+              icon: Icons.download_rounded,
+              onPressed: _downloadApk,
+            ),
+            GhostButton(
+              label: 'See Features',
+              icon: Icons.explore_rounded,
+              onPressed: () {},
+            ),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildPhoneMockup() {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 260),
-      height: 520,
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(36),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 60,
-            offset: const Offset(0, 30),
-          ),
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.15),
-            blurRadius: 80,
-            offset: const Offset(0, 40),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(36),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: Image.asset(
-                'assets/Images/app_screen.png',
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  color: AppColors.accent,
-                  child: const Center(
-                    child: Icon(Icons.restaurant_menu, size: 64, color: Colors.white38),
-                  ),
+  Widget _buildPhoneMockup({bool mobile = false}) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isPhoneHovered = true),
+      onExit: (_) => setState(() => _isPhoneHovered = false),
+      child: AnimatedBuilder(
+        animation: _floatAnimation,
+        builder: (context, child) {
+          return Transform.translate(
+            offset: Offset(0, _floatAnimation.value),
+            child: child,
+          );
+        },
+        child: Container(
+          constraints: BoxConstraints(maxWidth: mobile ? 220 : 280),
+          height: mobile ? 400 : 560,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(mobile ? 28 : 40),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(
+                  alpha: _isPhoneHovered ? 0.3 : 0.15,
                 ),
+                blurRadius: _isPhoneHovered ? 80 : 40,
+                spreadRadius: _isPhoneHovered ? 20 : 10,
+                offset: const Offset(0, 20),
+              ),
+            ],
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(mobile ? 28 : 40),
+              border: Border.all(
+                color: AppColors.surfaceBorder.withValues(alpha: 0.3),
+                width: 1.5,
               ),
             ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 30,
-                color: AppColors.accent,
-              ),
-            ),
-            Positioned(
-              top: 8,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  width: 120,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(3),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(mobile ? 26 : 38),
+              child: Stack(
+                children: [
+                  Image.asset(
+                    'assets/screenshots/Screenshot_20260604-143245.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      color: AppColors.surface,
+                      child: const Center(
+                        child: Icon(
+                          Icons.phone_android_rounded,
+                          size: 64,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 28,
+                      decoration: const BoxDecoration(
+                        color: AppColors.background,
+                      ),
+                      child: Center(
+                        child: Container(
+                          width: 100,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: AppColors.textMuted.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildFloatingBadge(IconData icon, String title, String subtitle) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-      ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: AppColors.primary, size: 20),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
-                    fontSize: 11,
-                  ),
-                ),
-              ],
-            ),
-          ],
-      ),
-    );
-  }
-
-  Widget _buildPrimaryButton(String label, IconData icon, VoidCallback onPressed) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        elevation: 0,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 20),
-          const SizedBox(width: 10),
-          Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSecondaryButton(String label, IconData icon, VoidCallback onPressed) {
-    return OutlinedButton(
-      onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
-        foregroundColor: Colors.white,
-        side: BorderSide(color: Colors.white.withValues(alpha: 0.5), width: 1.5),
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 20),
-          const SizedBox(width: 10),
-          Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-        ],
       ),
     );
   }
