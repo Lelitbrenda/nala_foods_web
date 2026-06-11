@@ -65,7 +65,7 @@ class FeaturesSection extends StatelessWidget {
                 return GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: crossAxisCount,
-                    childAspectRatio: crossAxisCount == 1 ? 2.5 : 1.0,
+                    childAspectRatio: crossAxisCount == 1 ? 1.0 : 1.0,
                     crossAxisSpacing: 20,
                     mainAxisSpacing: 20,
                   ),

@@ -132,10 +132,17 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
         padding: const EdgeInsets.symmetric(horizontal: 48),
         child: Row(
           children: [
-            Image.asset(
-              'assets/logo/logo19.png',
-              height: _isScrolled ? 36 : 40,
-              fit: BoxFit.contain,
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.all(8),
+              child: Image.asset(
+                'assets/logo/logo19.png',
+                height: _isScrolled ? 28 : 32,
+                fit: BoxFit.contain,
+              ),
             ),
             const SizedBox(width: 48),
             ..._navItems.map((item) {
@@ -179,10 +186,17 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
-                  Image.asset(
-                    'assets/logo/logo19.png',
-                    height: 36,
-                    fit: BoxFit.contain,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: Image.asset(
+                      'assets/logo/logo19.png',
+                      height: 28,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                   const Spacer(),
                   SizedBox(

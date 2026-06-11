@@ -58,8 +58,8 @@ class CtaSection extends StatelessWidget {
             },
           ),
           const SizedBox(height: 16),
-          GhostButton(
-            label: 'Become a Partner',
+          CtaButton(
+            label: 'Become a Seller',
             icon: Icons.store_rounded,
             onPressed: () async {
               final uri = Uri.parse('/apk/app-release.apk');

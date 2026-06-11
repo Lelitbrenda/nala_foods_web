@@ -13,10 +13,7 @@ class HeroSection extends StatefulWidget {
 }
 
 class _HeroSectionState extends State<HeroSection> {
-  static const List<String> _mockups = [
-    'assets/mockups/photo1.png',
-    'assets/mockups/photo2.png',
-  ];
+  static const List<String> _mockups = ['assets/mockups/photo1.png', 'assets/mockups/photo2.png'];
   int _currentMockup = 0;
 
   Future<void> _downloadApk() async {
@@ -43,11 +40,7 @@ class _HeroSectionState extends State<HeroSection> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            AppColors.background,
-            const Color(0xFF0A0A0A),
-            AppColors.background,
-          ],
+          colors: [AppColors.background, const Color(0xFF0A0A0A), AppColors.background],
         ),
       ),
       child: SafeArea(
@@ -55,15 +48,11 @@ class _HeroSectionState extends State<HeroSection> {
           builder: (context, constraints) {
             final isWide = constraints.maxWidth > 800;
             return Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: isWide ? 48 : 16,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: isWide ? 48 : 16),
               child: Center(
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 1400),
-                  child: isWide
-                      ? _buildDesktopLayout()
-                      : _buildMobileLayout(screenHeight * 0.85),
+                  child: isWide ? _buildDesktopLayout() : _buildMobileLayout(screenHeight * 1.05),
                 ),
               ),
             );
@@ -76,15 +65,67 @@ class _HeroSectionState extends State<HeroSection> {
   Widget _buildDesktopLayout() {
     return Row(
       children: [
-        Expanded(flex: 5, child: _buildTextContent()),
-        const SizedBox(width: 60),
+        Expanded(flex: 4, child: _buildTextContent()),
+
+        const SizedBox(width: 20),
+
         Expanded(
-          flex: 5,
-          child: Row(
+          flex: 6,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
             children: [
-              Expanded(child: _buildMockupImage(_mockups[0])),
-              const SizedBox(width: 24),
-              Expanded(child: _buildMockupImage(_mockups[1])),
+              // Orange glow
+              Container(
+                width: 900,
+                height: 600,
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    colors: [
+                      AppColors.primary.withOpacity(0.35),
+                      AppColors.primary.withOpacity(0.15),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.45, 1.0],
+                  ),
+                ),
+              ),
+
+              // Decorative dots
+              Positioned(
+                left: 120,
+                top: 180,
+                child: SizedBox(
+                  width: 120,
+                  child: Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: List.generate(
+                      20,
+                      (_) => Container(
+                        width: 4,
+                        height: 4,
+                        decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.5), shape: BoxShape.circle),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Back screenshot
+              Positioned(
+                left: 80,
+                child: Opacity(
+                  opacity: 0.85,
+                  child: Transform.rotate(
+                    angle: -0.12,
+                    child: Transform.scale(scale: 0.82, child: _buildMockupImage(_mockups[1])),
+                  ),
+                ),
+              ),
+
+              // Front screenshot
+              Positioned(right: 40, child: Transform.rotate(angle: 0.05, child: _buildMockupImage(_mockups[0]))),
             ],
           ),
         ),
@@ -93,52 +134,23 @@ class _HeroSectionState extends State<HeroSection> {
   }
 
   Widget _buildMobileLayout(double availableHeight) {
-    return SingleChildScrollView(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: availableHeight),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildTextContent(),
-            const SizedBox(height: 40),
-            GestureDetector(
-              onTap: _switchMockup,
-              child: _buildMockupImage(_mockups[_currentMockup]),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Tap to switch view',
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: AppColors.textMuted,
-              ),
-            ),
-          ],
-        ),
+    return ConstrainedBox(
+      constraints: BoxConstraints(minHeight: availableHeight),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildTextContent(),
+          const SizedBox(height: 40),
+          GestureDetector(onTap: _switchMockup, child: _buildMockupImage(_mockups[_currentMockup])),
+          const SizedBox(height: 12),
+          Text('Tap to switch view', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textMuted)),
+        ],
       ),
     );
   }
 
   Widget _buildMockupImage(String path) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final mockupHeight = (screenHeight * 0.55).clamp(280.0, 520.0);
-    return Container(
-      constraints: BoxConstraints(maxHeight: mockupHeight),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Image.asset(
-          path,
-          fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) => Container(
-            height: mockupHeight,
-            color: AppColors.surface,
-            child: const Center(
-              child: Icon(Icons.phone_android_rounded, size: 64, color: AppColors.textMuted),
-            ),
-          ),
-        ),
-      ),
-    );
+    return _HeroMockup(path: path, mockupHeight: 760);
   }
 
   Widget _buildTextContent() {
@@ -160,24 +172,34 @@ class _HeroSectionState extends State<HeroSection> {
               const SizedBox(width: 8),
               Text(
                 'Discover & Order',
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
-                ),
+                style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary),
               ),
             ],
           ),
         ),
         const SizedBox(height: 28),
-        Text(
-          'Discover Local\nRestaurants and\nOrder with Ease',
-          style: GoogleFonts.outfit(
-            fontSize: responsiveFontSize(context, 26, 72),
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-            height: 1.05,
-            letterSpacing: -1.5,
+        RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: 'Discover Local\nRestaurants and\n',
+                style: GoogleFonts.outfit(
+                  fontSize: responsiveFontSize(context, 26, 72),
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                  height: 1.05,
+                ),
+              ),
+              TextSpan(
+                text: 'Order with Ease',
+                style: GoogleFonts.outfit(
+                  fontSize: responsiveFontSize(context, 26, 72),
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                  height: 1.05,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 20),
@@ -185,11 +207,7 @@ class _HeroSectionState extends State<HeroSection> {
           constraints: const BoxConstraints(maxWidth: 480),
           child: Text(
             'Browse menus, connect with restaurants, and enjoy a smarter food ordering experience.',
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              color: AppColors.textSecondary,
-              height: 1.6,
-            ),
+            style: GoogleFonts.inter(fontSize: 18, color: AppColors.textSecondary, height: 1.6),
           ),
         ),
         const SizedBox(height: 36),
@@ -197,19 +215,65 @@ class _HeroSectionState extends State<HeroSection> {
           spacing: 16,
           runSpacing: 12,
           children: [
-            CtaButton(
-              label: 'Download for Android',
-              icon: Icons.download_rounded,
-              onPressed: _downloadApk,
-            ),
-            GhostButton(
-              label: 'See Features',
-              icon: Icons.explore_rounded,
-              onPressed: () {},
-            ),
+            CtaButton(label: 'Download for Android', icon: Icons.download_rounded, onPressed: _downloadApk),
+            GhostButton(label: 'See Features', icon: Icons.explore_rounded, onPressed: () {}),
           ],
         ),
       ],
+    );
+  }
+}
+
+class _HeroMockup extends StatefulWidget {
+  final String path;
+  final double mockupHeight;
+
+  const _HeroMockup({required this.path, required this.mockupHeight});
+
+  @override
+  State<_HeroMockup> createState() => _HeroMockupState();
+}
+
+class _HeroMockupState extends State<_HeroMockup> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        transform: _isHovered
+            ? (Matrix4.identity()
+                ..translate(0.0, -12.0)
+                ..scale(1.04))
+            : Matrix4.identity(),
+        child: Container(
+          width: 340,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(36),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.45),
+                blurRadius: 80,
+                spreadRadius: 5,
+                offset: const Offset(0, 35),
+              ),
+              BoxShadow(
+                color: AppColors.primary.withOpacity(0.18),
+                blurRadius: 120,
+                spreadRadius: 10,
+                offset: const Offset(0, 40),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(36),
+            child: Image.asset(widget.path, fit: BoxFit.cover),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -20,7 +20,7 @@ class SectionContainer extends StatelessWidget {
       padding: padding ?? EdgeInsets.symmetric(vertical: isMobile ? 48 : 80, horizontal: 24),
       child: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 1400),
+          constraints: BoxConstraints(maxWidth: isMobile ? 480 : 1400),
           child: child,
         ),
       ),

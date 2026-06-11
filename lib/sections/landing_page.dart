@@ -265,7 +265,14 @@ class _LandingPageState extends State<LandingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset('assets/logo/logo19.png', height: 40, fit: BoxFit.contain),
+              Container(
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(8),
+                child: Image.asset('assets/logo/logo19.png', height: 32, fit: BoxFit.contain),
+              ),
               const SizedBox(height: 16),
               Text(
                 'Discover local restaurants and order food with ease.',
@@ -313,7 +320,14 @@ class _LandingPageState extends State<LandingPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Image.asset('assets/logo/logo19.png', height: 40, fit: BoxFit.contain),
+        Container(
+          decoration: const BoxDecoration(
+            color: AppColors.primary,
+            shape: BoxShape.circle,
+          ),
+          padding: const EdgeInsets.all(8),
+          child: Image.asset('assets/logo/logo19.png', height: 32, fit: BoxFit.contain),
+        ),
         const SizedBox(height: 24),
         _footerLinksColumn('Navigation', [
           _FooterLink('Home', () => _scrollToKey(_heroKey)),

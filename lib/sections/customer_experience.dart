@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../widgets/section_container.dart';
+import '../widgets/phone_frame.dart';
 
 class CustomerExperience extends StatelessWidget {
   final GlobalKey? sectionKey;
@@ -12,19 +13,19 @@ class CustomerExperience extends StatelessWidget {
       icon: Icons.shopping_bag_rounded,
       title: 'Seamless Ordering',
       description: 'Place your order in seconds. Our intuitive interface makes it easy to find what you want, customize your meal, and checkout without any hassle.',
-      image: 'assets/screenshots/Screenshot_20260604-143327.png',
+      image: 'assets/screenshots/scrn2.png',
     ),
     _ExperienceData(
       icon: Icons.map_rounded,
       title: 'Easy Discovery',
       description: 'Find new restaurants and dishes you will love. Our smart recommendations help you discover hidden gems in your neighborhood.',
-      image: 'assets/screenshots/Screenshot_20260604-143352.png',
+      image: 'assets/screenshots/scrn3.png',
     ),
     _ExperienceData(
       icon: Icons.chat_bubble_rounded,
       title: 'Direct Communication',
       description: 'Chat directly with restaurants for special requests, dietary questions, or order modifications. No middlemen, just direct conversation.',
-      image: 'assets/screenshots/Screenshot_20260604-143245.png',
+      image: 'assets/screenshots/scrn1.png',
     ),
   ];
 
@@ -84,7 +85,7 @@ class _ExperienceData {
   });
 }
 
-class _ExperienceRow extends StatefulWidget {
+class _ExperienceRow extends StatelessWidget {
   final _ExperienceData experience;
   final bool isReversed;
 
@@ -94,57 +95,22 @@ class _ExperienceRow extends StatefulWidget {
   });
 
   @override
-  State<_ExperienceRow> createState() => _ExperienceRowState();
-}
-
-class _ExperienceRowState extends State<_ExperienceRow> {
-  bool _isHovered = false;
-
-  @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final imageHeight = (screenHeight * 0.55).clamp(300.0, 520.0);
+    final phoneWidth = 240.0;
+    final phoneHeight = phoneWidth * 2.1;
 
-    final imageWidget = MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 400),
-        transform: _isHovered
-            ? (Matrix4.identity()..scale(1.02))
-            : Matrix4.identity(),
-        constraints: const BoxConstraints(maxWidth: 280),
-        height: imageHeight,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(32),
-          color: AppColors.lightSurface,
-          border: Border.all(
-            color: AppColors.lightBorder.withValues(alpha: 0.5),
-            width: 1.5,
+    final imageWidget = SizedBox(
+      width: phoneWidth,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          _buildPhoneGlow(phoneWidth, phoneHeight),
+          PhoneFrame(
+            screenshotPath: experience.image,
+            width: phoneWidth,
+            height: phoneHeight,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withValues(
-                alpha: _isHovered ? 0.1 : 0.03,
-              ),
-              blurRadius: 40,
-              offset: const Offset(0, 20),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
-          child: Image.asset(
-            widget.experience.image,
-            fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) => Container(
-              color: AppColors.grey100,
-              child: const Center(
-                child: Icon(Icons.phone_android_rounded, size: 64, color: AppColors.grey),
-              ),
-            ),
-          ),
-        ),
+        ],
       ),
     );
 
@@ -159,11 +125,11 @@ class _ExperienceRowState extends State<_ExperienceRow> {
             color: AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(14),
           ),
-          child: Icon(widget.experience.icon, color: AppColors.primary, size: 24),
+          child: Icon(experience.icon, color: AppColors.primary, size: 24),
         ),
         const SizedBox(height: 20),
         Text(
-          widget.experience.title,
+          experience.title,
           style: GoogleFonts.outfit(
             fontSize: 28,
             fontWeight: FontWeight.bold,
@@ -173,7 +139,7 @@ class _ExperienceRowState extends State<_ExperienceRow> {
         ),
         const SizedBox(height: 16),
         Text(
-          widget.experience.description,
+          experience.description,
           style: GoogleFonts.inter(
             fontSize: 16,
             color: AppColors.lightTextSecondary,
@@ -185,9 +151,9 @@ class _ExperienceRowState extends State<_ExperienceRow> {
 
     return Row(
       children: [
-        Expanded(child: widget.isReversed ? textWidget : imageWidget),
+        Expanded(child: isReversed ? textWidget : imageWidget),
         const SizedBox(width: 48),
-        Expanded(child: widget.isReversed ? imageWidget : textWidget),
+        Expanded(child: isReversed ? imageWidget : textWidget),
       ],
     );
   }
@@ -195,45 +161,30 @@ class _ExperienceRowState extends State<_ExperienceRow> {
 
 class _ExperienceCard extends StatelessWidget {
   final _ExperienceData experience;
-  const _ExperienceCard({required this.experience});
+
+  const _ExperienceCard({
+    required this.experience,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final imageHeight = (screenHeight * 0.5).clamp(260.0, 460.0);
+    final phoneWidth = 240.0;
+    final phoneHeight = phoneWidth * 2.1;
 
     return Column(
       children: [
-        Container(
-          constraints: const BoxConstraints(maxWidth: 280),
-          height: imageHeight,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(32),
-            color: AppColors.lightSurface,
-            border: Border.all(
-              color: AppColors.lightBorder.withValues(alpha: 0.5),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 15,
-                offset: const Offset(0, 8),
+        SizedBox(
+          width: phoneWidth,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              _buildPhoneGlow(phoneWidth, phoneHeight),
+              PhoneFrame(
+                screenshotPath: experience.image,
+                width: phoneWidth,
+                height: phoneHeight,
               ),
             ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: Image.asset(
-              experience.image,
-              fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => Container(
-                color: AppColors.grey100,
-                child: const Center(
-                  child: Icon(Icons.phone_android_rounded, size: 64, color: AppColors.grey),
-                ),
-              ),
-            ),
           ),
         ),
         const SizedBox(height: 24),
@@ -269,4 +220,24 @@ class _ExperienceCard extends StatelessWidget {
       ],
     );
   }
+}
+
+Widget _buildPhoneGlow(double phoneWidth, double phoneHeight) {
+  return IgnorePointer(
+    child: Container(
+      width: phoneWidth * 1.5,
+      height: phoneHeight * 0.75,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [
+            AppColors.primary.withValues(alpha: 0.08),
+            AppColors.primary.withValues(alpha: 0.03),
+            Colors.transparent,
+          ],
+          stops: const [0.0, 0.5, 1.0],
+        ),
+      ),
+    ),
+  );
 }

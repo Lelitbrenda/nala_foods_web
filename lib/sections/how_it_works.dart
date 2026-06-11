@@ -51,7 +51,7 @@ class HowItWorks extends StatelessWidget {
             const SizedBox(height: 56),
             LayoutBuilder(
               builder: (context, constraints) {
-                final isWide = constraints.maxWidth > 768;
+                final isWide = constraints.maxWidth > 1100;
                 return isWide ? _buildDesktopFlow() : _buildMobileFlow();
               },
             ),

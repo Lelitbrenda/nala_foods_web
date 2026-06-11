@@ -94,7 +94,7 @@ class RestaurantSection extends StatelessWidget {
         )),
         const SizedBox(height: 16),
         CtaButton(
-          label: 'Become a Partner',
+          label: 'Become a Seller',
           icon: Icons.store_rounded,
           onPressed: () async {
             final uri = Uri.parse('/apk/app-release.apk');
@@ -210,7 +210,7 @@ class _DashboardPreviewState extends State<_DashboardPreview> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(23),
           child: Image.asset(
-            'assets/screenshots/Screenshot_20260604-143638.png',
+            'assets/screenshots/scrn4.png',
             fit: BoxFit.contain,
             errorBuilder: (_, __, ___) => Container(
               color: AppColors.grey100,
