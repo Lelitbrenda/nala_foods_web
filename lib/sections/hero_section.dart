@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:vector_math/vector_math_64.dart' show Vector3;
 import '../theme/app_theme.dart';
 import '../widgets/buttons.dart';
 
@@ -150,7 +151,7 @@ class _HeroSectionState extends State<HeroSection> {
   }
 
   Widget _buildMockupImage(String path) {
-    return _HeroMockup(path: path, mockupHeight: 760);
+    return _HeroMockup(path: path);
   }
 
   Widget _buildTextContent() {
@@ -226,29 +227,63 @@ class _HeroSectionState extends State<HeroSection> {
 
 class _HeroMockup extends StatefulWidget {
   final String path;
-  final double mockupHeight;
 
-  const _HeroMockup({required this.path, required this.mockupHeight});
+  const _HeroMockup({required this.path});
 
   @override
   State<_HeroMockup> createState() => _HeroMockupState();
 }
 
-class _HeroMockupState extends State<_HeroMockup> {
+class _HeroMockupState extends State<_HeroMockup>
+    with SingleTickerProviderStateMixin {
   bool _isHovered = false;
+  late final AnimationController _hoverController;
+  late final Animation<double> _hoverAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _hoverController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _hoverAnimation = CurvedAnimation(
+      parent: _hoverController,
+      curve: Curves.easeOutCubic,
+    );
+    _hoverController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _hoverController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final h = _hoverAnimation.value;
+    final offsetY = -(12.0 * h);
+    final scale = 1.0 + (0.04 * h);
+
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        transform: _isHovered
-            ? (Matrix4.identity()
-                ..translate(0.0, -12.0)
-                ..scale(1.04))
-            : Matrix4.identity(),
+      onEnter: (_) {
+        if (!_isHovered) {
+          _isHovered = true;
+          _hoverController.forward();
+        }
+      },
+      onExit: (_) {
+        if (_isHovered) {
+          _isHovered = false;
+          _hoverController.reverse();
+        }
+      },
+      child: Transform(
+        transform: Matrix4.identity()
+          ..translateByVector3(Vector3(0.0, offsetY, 0.0))
+          ..scaleByVector3(Vector3(scale, scale, 1.0)),
+        alignment: Alignment.center,
         child: Container(
           width: 340,
           decoration: BoxDecoration(
@@ -268,10 +303,8 @@ class _HeroMockupState extends State<_HeroMockup> {
               ),
             ],
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(36),
-            child: Image.asset(widget.path, fit: BoxFit.cover),
-          ),
+          clipBehavior: Clip.antiAlias,
+          child: Image.asset(widget.path, fit: BoxFit.cover),
         ),
       ),
     );
